@@ -106,7 +106,6 @@ class Question(models.Model):
     # question text
     # question grade/mark
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    # title = models.CharField(max_length=200, default="title")
     question_text = models.TextField()
     grade = models.FloatField()
 
