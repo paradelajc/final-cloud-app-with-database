@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
+from django.db.models import Sum
 # <HINT> Import any new Models here
 from .models import Course, Enrollment, Question, Choice, Submission
 from django.contrib.auth.models import User
@@ -123,7 +124,7 @@ def extract_answers(request):
 def submit(request, course_id):
     course = get_object_or_404(Course, pk=course_id)
     user = request.user
-    enrollment = Enrollment.objects.get(user=user, course=course)
+    enrollment = Enrollment.objects.get(course=course)
     submission = Submission.objects.create(enrollment=enrollment)
     choices = extract_answers(request)
     submission.choices.set(choices)
@@ -142,16 +143,22 @@ def submit(request, course_id):
 def show_exam_result(request, course_id, submission_id):
     context = {}
     course = get_object_or_404(Course, pk=course_id)
-    correct_choices = Choice.objects.filter(is_correct=True).count()
+    user = request.user
+    questions = Question.objects.filter(course=course)
+    max_grade = questions.aggregate(Sum('grade'))['grade__sum']
     submission = Submission.objects.get(id=submission_id)
     choices = submission.choices.all()
+
     total_score = 0
     for choice in choices:
-        if choice.is_correct:
-            total_score += choice.question.grade
+        if  choice.is_correct:
+            total_score += 1
+        else:
+            total_score -=1
+
 
     context['course'] = course
-    context['grade'] = int((total_score / correct_choices) * 100)
+    context['grade'] = int((total_score / max_grade) * 100)
     context['choices'] = choices
 
     return render(request, 'onlinecourse/exam_result_bootstrap.html', context)

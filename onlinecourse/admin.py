@@ -1,12 +1,13 @@
 from django.contrib import admin
+# from merged_inlines.admin import MergedInlineAdmin
 # <HINT> Import any new Models here
 from .models import Course, Lesson, Instructor, Learner, Question, Choice
 
 # <HINT> Register QuestionInline and ChoiceInline classes here
 
-class QuestionInLine(admin.StackedInline):
-    model = Question
-    extra = 3
+# class QuestionInLine(admin.StackedInline):
+#     model = Question
+#     extra = 3
 
 class ChoiceInLine(admin.StackedInline):
     model = Choice
@@ -20,7 +21,7 @@ class LessonInline(admin.StackedInline):
 
 # Register your models here.
 class CourseAdmin(admin.ModelAdmin):
-    inlines = [LessonInline, QuestionInLine]
+    inlines = [LessonInline]
     list_display = ('name', 'pub_date')
     list_filter = ['pub_date']
     search_fields = ['name', 'description']
