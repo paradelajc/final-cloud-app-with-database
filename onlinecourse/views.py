@@ -124,7 +124,7 @@ def extract_answers(request):
 def submit(request, course_id):
     course = get_object_or_404(Course, pk=course_id)
     user = request.user
-    enrollment = Enrollment.objects.get(course=course)
+    enrollment = Enrollment.objects.get(user=user, course=course)
     submission = Submission.objects.create(enrollment=enrollment)
     choices = extract_answers(request)
     submission.choices.set(choices)
@@ -143,7 +143,6 @@ def submit(request, course_id):
 def show_exam_result(request, course_id, submission_id):
     context = {}
     course = get_object_or_404(Course, pk=course_id)
-    user = request.user
     questions = Question.objects.filter(course=course)
     max_grade = questions.aggregate(Sum('grade'))['grade__sum']
     submission = Submission.objects.get(id=submission_id)
